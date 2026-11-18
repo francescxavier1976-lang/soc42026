@@ -141,6 +141,53 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:10px 2
 .nb.sec{background:#efe4d0;color:var(--brown)}
 .nb:disabled{opacity:.35;cursor:default}
 .prog{font-size:14px;color:var(--muted)}
+
+/* QÜESTIONARI */
+.mk.hidden0{opacity:0}
+.row.ask{background:repeating-linear-gradient(135deg,rgba(200,149,46,.10) 0 10px,rgba(200,149,46,.04) 10px 20px);border-radius:10px}
+.tag.q{background:#fff;color:#9a6f16;border:1.5px dashed var(--ochre)}
+.ck{font-style:normal;color:#9be3ae}
+.tl.on .ck{color:var(--ok)}
+.quiz{border:2px solid var(--ochre);border-radius:14px;padding:12px 14px;background:#fffdf7;margin-bottom:8px}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
+.qhead h3{font-size:18px;color:var(--brown)}
+.qhead .en{font-size:14px}
+.score{font-family:"Fredoka",sans-serif;font-weight:600;color:var(--brown);background:var(--ochre-soft);border-radius:8px;padding:2px 10px;font-size:14px;white-space:nowrap}
+.qb{border-top:1px dashed var(--line);padding:10px 0 8px}
+.qt{font-weight:700;font-size:16px}
+.qt .en{font-weight:400;font-size:14px}
+.qn{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:6px;color:#fff;font-family:"Fredoka",sans-serif;font-size:14px;margin-right:4px}
+.n1{background:var(--p2)}.n2{background:var(--ochre)}.n3{background:var(--p0)}
+.qsub{font-size:14px;color:var(--muted);margin:2px 0 6px}
+.qsub .en{font-size:13px}
+.prow{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:center;margin:6px 0}
+.prow b{font-family:"Fredoka",sans-serif;font-weight:600;font-size:15px;line-height:1.1}
+.prow b .en{display:block;font-family:"Atkinson",sans-serif;font-size:12px}
+.pslots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pslot{border:2px dashed #d6c39f;border-radius:9px;background:#fff;padding:5px 3px;font-size:13.5px;line-height:1.15;text-align:center}
+.pslot .en{display:block;font-size:11.5px}
+.pslot:hover:not(:disabled){border-color:var(--ochre)}
+.pslot.sel{border:2px solid var(--p2);background:#e6eff7;font-weight:700}
+.pslot.bad{border:2px solid var(--warn);background:var(--warn-soft)}
+.pslot.ok{border:2px solid var(--ok);background:var(--ok-soft);font-weight:700}
+.pslot.off{border-style:solid;border-color:#eee3cf;color:#cdbfa6;display:flex;align-items:center;justify-content:center}
+.pslot:disabled{cursor:default}
+.rowhint{margin:-2px 0 4px 128px;font-size:13.5px;color:#7d2019}
+.qbtns{display:flex;gap:8px;margin-top:6px}
+.nb.small{font-size:15px;padding:6px 14px}
+.cls{display:grid;grid-template-columns:1fr 112px 112px;gap:6px;align-items:center;margin:5px 0;font-size:15.5px}
+.cls .en{font-size:13px}
+.pill{border:2px solid var(--line);border-radius:9px;background:#fff;padding:4px 3px;font-size:14px;line-height:1.1;text-align:center}
+.pill .en{display:block;font-size:11.5px}
+.pill:hover:not(:disabled){border-color:var(--ochre)}
+.pill.on{border-color:var(--ok);background:var(--ok-soft);font-weight:700}
+.pill.bad{border-color:var(--warn);background:var(--warn-soft)}
+.pill:disabled{cursor:default}
+.opt .en{font-size:13.5px}
+.total{display:flex;gap:16px;align-items:center;background:var(--ok-soft);border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:16px}
+.tn{font-family:"Fredoka",sans-serif;font-weight:600;font-size:40px;color:var(--ok);line-height:1;white-space:nowrap}
+.tn small{font-size:20px;color:var(--muted)}
+.pend{color:var(--warn);font-size:14.5px}
 footer{font-size:12px;color:var(--muted);text-align:center;padding:0 0 8px}
 </style>
 </head>
@@ -308,11 +355,117 @@ const FINAL = [
   ["Llibertats?","Menys que el 1791, però més que durant el Terror."]
 ];
 
+/* ---------- QÜESTIONARI «POSA'T A PROVA» ---------- */
+const RIDX={poder:0,priv:1,vot:2,const:3,llib:4};
+const SLOT=[["Antic Règim","Old Regime"],["A mig camí","Halfway"],["Règim liberal","Liberal regime"],["Més enllà","Even further"]];
+const MC=[["Es manté","Stays"],["Canvia","Changes"]];
+const VF=[["Veritat","True"],["Fals","False"]];
+const QUIZ=[
+ {pred:[{row:"vot",ok:0,hint:"Pensa-ho: a l'Antic Règim, qui fa les lleis?"}],
+  predYes:"Correcte: a l'Antic Règim no es vota. La llei la fa el rei.",
+  cls:{vf:true,items:[
+    ["El clergat i la noblesa paguen molts impostos.","The clergy and the nobility pay a lot of taxes.",1],
+    ["La llei és el que vol el rei.","The law is whatever the king wants.",0],
+    ["Qui critica el rei pot anar a la presó.","Whoever criticises the king can go to prison.",0]]},
+  test:{ca:"D'on diu el rei que ve el seu poder?",en:"Where does the king say his power comes from?",
+    opts:[["Del poble","From the people"],["De Déu","From God"],["De la Constitució","From the Constitution"]],ok:1,
+    yes:"Això és el dret diví: el rei no ha de donar explicacions a ningú.",
+    hint:"Pensa en el nom: dret <b>diví</b>."}},
+ {pred:[{row:"poder",ok:1,hint:"El rei encara mana, però algú li planta cara. No és ni un extrem ni l'altre."}],
+  predYes:"El tercer estat diu que ell representa la nació, però el rei encara mana.",
+  cls:{items:[
+    ["Als Estats Generals es vota per estament.","At the Estates General they vote by estate.",0],
+    ["El tercer estat es declara Assemblea Nacional.","The Third Estate declares itself the National Assembly.",1],
+    ["Els privilegiats quasi no paguen impostos.","The privileged hardly pay any taxes.",0]]},
+  test:{ca:"Per què el tercer estat vol votar per persona?",en:"Why does the Third Estate want to vote by person?",
+    opts:[["Perquè té tants diputats com els altres dos junts i, amb alguns capellans, guanyaria","Because it has as many deputies as the other two together and, with some priests, it would win"],
+          ["Perquè vol que el rei mani més","Because it wants the king to have more power"],
+          ["Perquè el clergat li ho demana","Because the clergy asks it to"]],ok:0,
+    yes:"Exacte. Si es vota per persona, el tercer estat guanya.",
+    hint:"Mira els números: uns 600 diputats del tercer estat contra 300 + 300."}},
+ {pred:[{row:"priv",ok:2,hint:"Què fa l'Assemblea amb els privilegis?"},
+        {row:"vot",ok:2,hint:"Voten tots? Recorda el sufragi censatari."}],
+  predYes:"S'acaben els privilegis. Però voten només els homes amb diners: sufragi censatari, no tothom.",
+  cls:{items:[
+    ["Hi ha rei.","There is a king.",0],
+    ["Hi ha una Constitució.","There is a Constitution.",1],
+    ["Tothom és igual davant la llei.","Everyone is equal before the law.",1],
+    ["Les dones no voten.","Women don't vote.",0]]},
+  test:{ca:"El 1791, un pagès pobre pot votar?",en:"In 1791, can a poor peasant vote?",
+    opts:[["Sí, tothom vota","Yes, everyone votes"],["No, només voten els homes amb diners","No, only men with money vote"],["Només si és noble","Only if he is a noble"]],ok:1,
+    yes:"Exacte: és el sufragi censatari. La Revolució inventa el ciutadà… però no tothom ho és.",
+    hint:"Recorda el sufragi censatari: per votar calia pagar prou impostos."}},
+ {pred:[{row:"poder",ok:2,hint:"Compte, és una trampa: les regles de 1791 encara funcionen."}],
+  predYes:"No es mou! Tot trontolla, però les regles de 1791 continuen.",
+  cls:{items:[
+    ["França és una monarquia constitucional.","France is a constitutional monarchy.",0],
+    ["Voten només els homes amb diners.","Only men with money vote.",0],
+    ["França entra en guerra contra Àustria.","France goes to war against Austria.",1],
+    ["Els sans-culottes ataquen les Tulleries.","The sans-culottes attack the Tuileries.",1]]},
+  test:{ca:"Per què no es mou cap fletxa?",en:"Why does no arrow move?",
+    opts:[["Les regles no canvien, però la tensió creix","The rules don't change, but tension grows"],["El rei recupera el poder","The king gets his power back"],["La Revolució s'acaba","The Revolution ends"]],ok:0,
+    yes:"Correcte. De vegades, el que canvia no són les lleis sinó la confiança.",
+    hint:"Llegeix el text: què passa amb el rei i amb el poble?"}},
+ {pred:[{row:"vot",ok:3,hint:"Ara voten tots els homes, rics i pobres: això va més lluny que el règim liberal."},
+        {row:"llib",ok:0,hint:"Amb el Terror et poden detenir només per ser sospitós."}],
+  predYes:"Voten tots els homes, i alhora el Terror et pot detenir només per ser sospitós.",
+  cls:{items:[
+    ["No hi ha privilegis.","There are no privileges.",0],
+    ["Ja no hi ha rei: França és una República.","There is no king any more: France is a Republic.",1],
+    ["Les dones no voten.","Women don't vote.",0]]},
+  test:{ca:"Per què diem que la Revolució no és una línia recta?",en:"Why do we say the Revolution is not a straight line?",
+    opts:[["Perquè vota més gent que mai i alhora et poden detenir per ser sospitós","Because more people vote than ever and, at the same time, you can be arrested on suspicion"],
+          ["Perquè torna el rei","Because the king comes back"],["Perquè tornen els privilegis","Because privileges come back"]],ok:0,
+    yes:"Sí. Alhora va més enllà que mai i torna enrere de tot.",
+    hint:"Mira les files «Qui vota?» i «Llibertats?» del tauler."}},
+ {pred:[{row:"vot",ok:2,hint:"Qui torna a votar amb el Directori? Llegeix el text."}],
+  predYes:"Torna enrere: tornen a votar només els homes amb diners, com el 1791.",
+  cls:{items:[
+    ["No hi ha rei.","There is no king.",0],
+    ["S'acaba el Terror.","The Terror ends.",1],
+    ["Governa un Directori de cinc persones.","A Directory of five people governs.",1]]},
+  test:{ca:"Qui torna a manar?",en:"Who is in power again?",
+    opts:[["La burgesia moderada","The moderate bourgeoisie"],["Els jacobins","The Jacobins"],["El rei","The king"]],ok:0,
+    yes:"Correcte. Després del Terror, torna a manar la burgesia moderada.",
+    hint:"Robespierre i els jacobins ja han caigut, i rei no n'hi ha."}},
+ {pred:[{row:"priv",ok:2,hint:"Napoleó torna a posar privilegis?"},
+        {row:"poder",ok:1,hint:"Mana un sol home, però no és un rei per dret diví."}],
+  predYes:"Mana un sol home, però els privilegis no tornen.",
+  cls:{items:[
+    ["Tothom és igual davant la llei.","Everyone is equal before the law.",0],
+    ["Mana un sol home.","One man rules.",1],
+    ["Es tanquen molts diaris.","Many newspapers are closed.",1]]},
+  test:{ca:"Hem tornat a l'Antic Règim?",en:"Are we back to the Old Regime?",
+    opts:[["Sí, tot torna com abans","Yes, everything is as before"],["No del tot: mana un sol home, però els privilegis no tornen","Not quite: one man rules, but privileges don't come back"],["No, ara mana el poble","No, now the people rule"]],ok:1,
+    yes:"Exacte. Napoleó no és un rei per dret diví, i la igualtat davant la llei es queda.",
+    hint:"Mira la fila dels privilegis: on és la fletxa?"}}
+];
+const NQ = QUIZ.length*3;
+
 /* ---------- ESTAT ---------- */
-let cur=0, visited=new Set([0]);
-const answers={};
+let cur=0, visited=new Set([0]), ST;
+function resetState(){
+  ST=QUIZ.map(()=>({pred:{sel:{},done:{},first:null,shown:false,msg:""},cls:{ok:{},bad:{},wrong:false},test:{done:false,first:null,last:null}}));
+}
+resetState();
 const $=s=>document.querySelector(s);
 const pct=p=>((p+0.5)/4*100)+"%";
+
+function revealed(i,rowId){
+  const Q=QUIZ[i]; if(!Q) return true;
+  const pr=Q.pred.find(x=>x.row===rowId);
+  return !pr || !!ST[i].pred.done[rowId];
+}
+function clsDone(i){return QUIZ[i].cls.items.every((_,k)=>ST[i].cls.ok[k]);}
+function predDone(i){return QUIZ[i].pred.every(p=>ST[i].pred.done[p.row]);}
+function stageScore(i){
+  const s=ST[i]; let n=0;
+  if(predDone(i)&&s.pred.first===true) n++;
+  if(clsDone(i)&&!s.cls.wrong) n++;
+  if(s.test.done&&s.test.first===true) n++;
+  return n;
+}
+function stageAnswered(i){return (predDone(i)?1:0)+(clsDone(i)?1:0)+(ST[i].test.done?1:0);}
 
 /* ---------- CONSTRUIR TAULER ---------- */
 function buildBoard(){
@@ -351,10 +504,13 @@ function buildTimeline(){
   STAGES.forEach((s,i)=>{
     const b=document.createElement("button");
     b.className="tl"; b.id="tl-"+i;
-    b.innerHTML=`<b>${s.n==="★"?"★":s.n==="5b"?"5 ·":s.n+" ·"} ${s.short}</b><span>${s.years}</span>`;
+    b.innerHTML=`<b>${s.n==="★"?"★":s.n==="5b"?"5 ·":s.n+" ·"} ${s.short}<em class="ck" id="ck-${i}"></em></b><span>${s.years}</span>`;
     b.onclick=()=>go(i);
     t.appendChild(b);
   });
+}
+function updateChecks(){
+  QUIZ.forEach((_,i)=>{ $("#ck-"+i).textContent = stageAnswered(i)===3 ? " ✓" : ""; });
 }
 
 /* ---------- ACTUALITZAR TAULER ---------- */
@@ -362,10 +518,21 @@ function updateBoard(i){
   const s=STAGES[i];
   const prevIdx = s.final ? 0 : i-1;
   const prev = prevIdx>=0 ? STAGES[prevIdx].pos : null;
-  $("#ghostLabel").textContent = s.final ? "On érem abans del 1789" : (i===0 ? "On érem a l'etapa anterior" : "On érem a l'etapa anterior");
+  $("#ghostLabel").textContent = s.final ? "On érem abans del 1789" : "On érem a l'etapa anterior";
   ROWS.forEach((r,k)=>{
-    const p=s.pos[k];
     const mk=$("#mk-"+r.id), gh=$("#gh-"+r.id), tr=$("#tr-"+r.id), row=$("#row-"+r.id), tag=$("#tag-"+r.id);
+    const rev = s.final ? true : revealed(i,r.id);
+    if(!rev){
+      const p0 = prev ? prev[k] : 0;
+      mk.style.left=pct(p0); mk.style.background="#b9a688"; mk.textContent="?";
+      mk.classList.toggle("hidden0", !prev);
+      gh.classList.remove("show"); tr.classList.remove("show");
+      row.classList.remove("moved"); row.classList.add("ask");
+      tag.textContent="Endevina-ho!"; tag.className="tag q";
+      return;
+    }
+    row.classList.remove("ask"); mk.classList.remove("hidden0"); mk.textContent="";
+    const p=s.pos[k];
     const moved = prev && prev[k]!==p;
     mk.style.left=pct(p); mk.style.background=COLORS[p];
     mk.classList.remove("pulse"); void mk.offsetWidth;
@@ -383,11 +550,14 @@ function updateBoard(i){
 }
 
 /* ---------- CONTINGUT ---------- */
-function esc(x){return x;}
 function render(i){
   const s=STAGES[i], sc=$("#scroll");
   let h=`<div class="stagehead"><div class="num">${s.n==="5b"?"5":s.n}</div><div><h2>${s.ca}</h2><span class="en">${s.en}</span></div><div class="date">${s.years}</div></div>`;
   if(s.final){
+    const tot=QUIZ.reduce((a,_,k)=>a+stageScore(k),0);
+    const pend=QUIZ.map((_,k)=>k).filter(k=>stageAnswered(k)<3);
+    const msg = tot>=17 ? "Molt bé! Domines les etapes de la Revolució." : tot>=11 ? "Bona feina. Repassa les etapes on has fallat." : "Torna a fer el recorregut amb els apunts al costat. Segur que la segona vegada va millor.";
+    h+=`<div class="total"><div class="tn">${tot} <small>/ ${NQ}</small></div><div><b>Preguntes encertades a la primera</b> <span class="en">Right first time</span><br>${pend.length?"":msg}${pend.length?`<br><span class="pend">Et falten preguntes per respondre a: ${pend.map(k=>STAGES[k].short).join(", ")}.</span>`:""}</div></div>`;
     h+=`<div class="txt"><p>Compara les dues fletxes de cada fila: el cercle de punts és on érem abans del 1789 (Antic Règim), i el color, on som el 1799.</p></div>
     <div class="final-list">${FINAL.map(f=>`<div class="fi"><b>${f[0]}</b><span>${f[1]}</span></div>`).join("")}</div>
     <div class="big">Hem tornat al principi? No del tot.</div>
@@ -395,7 +565,7 @@ function render(i){
     <div class="box keep" style="margin-bottom:14px"><h3>I les dones? <span class="en">And women?</span></h3>En cap etapa no voten. La Revolució inventa la idea de ciutadà… però no tothom és ciutadà.</div>
     <button class="nb sec" id="restart">↺ Torna a començar</button>`;
     sc.innerHTML=h; sc.scrollTop=0;
-    $("#restart").onclick=()=>go(0);
+    $("#restart").onclick=()=>{resetState();visited=new Set([0]);updateChecks();go(0);};
     return;
   }
   h+=`<div class="pics ${s.imgs.length>1?'two':'one'}">${s.imgs.map(([k,c])=>`<figure><img src="data:image/jpeg;base64,${IMG[k]}" alt="${c}"><figcaption>${c}</figcaption></figure>`).join("")}</div>`;
@@ -408,29 +578,103 @@ function render(i){
       <div class="box new"><h3>Què és nou <span class="en">What's new</span></h3>${s.newTxt}</div></div>`;
   }
   h+=`<div class="words"><span class="wl">Paraules clau · <span class="en">Key words</span></span>${s.words.map(w=>`<span class="chip">${w[0]} · <span class="en">${w[1]}</span> · <span class="ar" lang="ar" dir="rtl">${w[2]}</span></span>`).join("")}</div>`;
-  const q=s.q;
-  h+=`<div class="q"><h3>Pregunta · <span class="en">Question</span>: ${q.ca} <span class="en">${q.en}</span></h3>
-    <div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-k="${k}">${String.fromCharCode(97+k)}) ${o}</button>`).join("")}</div>
-    <div class="fb" id="fb"></div></div>`;
+  h+=`<div class="quiz" id="quiz"></div>`;
   sc.innerHTML=h; sc.scrollTop=0;
-  sc.querySelectorAll(".opt").forEach(b=>b.onclick=()=>answer(i,+b.dataset.k));
-  if(answers[i]!==undefined) showAnswer(i,answers[i]);
+  renderQuiz(i);
 }
-function answer(i,k){ answers[i]=k; showAnswer(i,k); }
-function showAnswer(i,k){
-  const q=STAGES[i].q, fb=$("#fb");
-  document.querySelectorAll(".opt").forEach(b=>b.classList.remove("wrong"));
-  const btn=document.querySelector(`.opt[data-k="${k}"]`);
-  if(k===q.ok){
-    btn.classList.add("right");
-    document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
-    fb.className="fb ok"; fb.innerHTML="✔ "+q.yes;
-    fb.scrollIntoView({block:"nearest",behavior:"smooth"});
-  } else {
-    btn.classList.add("wrong");
-    fb.className="fb ko"; fb.innerHTML=q.hint+" Torna-ho a provar.";
-    fb.scrollIntoView({block:"nearest",behavior:"smooth"});
-  }
+
+function renderQuiz(i){
+  const Q=QUIZ[i], S=ST[i], box=$("#quiz");
+  const lab=(a)=>`${a[0]} <span class="en">${a[1]}</span>`;
+  let h=`<div class="qhead"><h3>Posa't a prova <span class="en">Test yourself</span></h3><span class="score">Encertades a la primera: ${stageScore(i)} / 3</span></div>`;
+  /* 1 · predicció */
+  h+=`<div class="qb"><div class="qt"><span class="qn n1">1</span> On va la fletxa? <span class="en">Where does the arrow go?</span></div>
+      <div class="qsub">${i===0?"Clica on creus que és la fletxa.":"Clica on creus que quedarà la fletxa. Després es mourà al tauler."} <span class="en">Click where you think the arrow goes.</span></div>`;
+  Q.pred.forEach(pr=>{
+    const r=ROWS[RIDX[pr.row]], done=S.pred.done[pr.row], sel=S.pred.sel[pr.row];
+    h+=`<div class="prow"><b>${r.ca}<span class="en">${r.en}</span></b><div class="pslots">`;
+    [0,1,2,3].forEach(p=>{
+      if(p===3 && !r.ext){h+=`<span class="pslot off">—</span>`;return;}
+      let c="pslot";
+      if(done && p===pr.ok) c+=" ok";
+      else if(!done && sel===p) c+= (S.pred.bad&&S.pred.bad[pr.row]===p) ? " bad" : " sel";
+      h+=`<button class="${c}" data-row="${pr.row}" data-p="${p}" ${done?"disabled":""}>${lab(SLOT[p])}</button>`;
+    });
+    h+=`</div></div>`;
+    if(!done && S.pred.bad && S.pred.bad[pr.row]!==undefined && S.pred.bad[pr.row]===sel) h+=`<div class="rowhint">${pr.hint}</div>`;
+  });
+  if(!predDone(i)) h+=`<div class="qbtns"><button class="nb small" id="chk">Comprova</button><button class="nb small sec" id="show">Ensenya-m'ho</button></div>`;
+  if(S.pred.msg) h+=`<div class="fb ${predDone(i)?'ok':'ko'}" style="display:block">${S.pred.msg}</div>`;
+  h+=`</div>`;
+  /* 2 · es manté o canvia / veritat o fals */
+  const vf=!!Q.cls.vf, L=vf?VF:MC;
+  h+=`<div class="qb"><div class="qt"><span class="qn n2">2</span> ${vf?'Veritat o fals? <span class="en">True or false?</span>':'Es manté o canvia? <span class="en">Does it stay or change?</span>'}</div>
+      <div class="qsub">${vf?"Abans de 1789.":"Respecte de l'etapa anterior."} <span class="en">${vf?"Before 1789.":"Compared with the previous stage."}</span></div>`;
+  Q.cls.items.forEach((it,k)=>{
+    const ok=S.cls.ok[k];
+    h+=`<div class="cls"><span>${it[0]}<span class="en"> ${it[1]}</span></span>`;
+    [0,1].forEach(v=>{
+      let c="pill"; if(ok && v===it[2]) c+=" on"; else if(!ok && S.cls.bad[k]===v) c+=" bad";
+      h+=`<button class="${c}" data-k="${k}" data-v="${v}" ${ok?"disabled":""}>${lab(L[v])}</button>`;
+    });
+    h+=`</div>`;
+  });
+  if(clsDone(i)) h+=`<div class="fb ok" style="display:block">✔ Molt bé!${S.cls.wrong?" Ara ja ho tens.":""}</div>`;
+  else if(Object.keys(S.cls.bad).some(k=>S.cls.bad[k]!==undefined)) h+=`<div class="fb ko" style="display:block">Alguna no és correcta. Torna-ho a mirar al text i al tauler.</div>`;
+  h+=`</div>`;
+  /* 3 · tipus test */
+  const T=Q.test;
+  h+=`<div class="qb"><div class="qt"><span class="qn n3">3</span> ${T.ca} <span class="en">${T.en}</span></div><div class="opts">`;
+  T.opts.forEach((o,k)=>{
+    let c="opt"; if(S.test.done && k===T.ok) c+=" right"; else if(!S.test.done && S.test.last===k) c+=" wrong";
+    h+=`<button class="${c}" data-o="${k}" ${S.test.done?"disabled":""}>${String.fromCharCode(97+k)}) ${o[0]} <span class="en">${o[1]}</span></button>`;
+  });
+  h+=`</div>`;
+  if(S.test.done) h+=`<div class="fb ok" style="display:block">✔ ${T.yes}</div>`;
+  else if(S.test.last!==null) h+=`<div class="fb ko" style="display:block">No és aquesta. ${T.hint} Torna-ho a provar.</div>`;
+  h+=`</div>`;
+  box.innerHTML=h;
+
+  /* esdeveniments */
+  box.querySelectorAll(".pslot[data-row]").forEach(b=>b.onclick=()=>{
+    S.pred.sel[b.dataset.row]=+b.dataset.p; S.pred.msg=""; renderQuiz(i);
+  });
+  const chk=$("#chk"), show=$("#show");
+  if(chk) chk.onclick=()=>{
+    const pend=Q.pred.filter(p=>!S.pred.done[p.row]);
+    if(pend.some(p=>S.pred.sel[p.row]===undefined)){ S.pred.msg="Tria una casella a cada fila."; renderQuiz(i); return; }
+    let allOk=true; S.pred.bad=S.pred.bad||{};
+    pend.forEach(p=>{
+      if(S.pred.sel[p.row]===p.ok){ S.pred.done[p.row]=true; delete S.pred.bad[p.row]; }
+      else { allOk=false; S.pred.bad[p.row]=S.pred.sel[p.row]; }
+    });
+    if(S.pred.first===null) S.pred.first=allOk;
+    S.pred.msg = predDone(i) ? "✔ "+Q.predYes+" Mira el tauler." : "Alguna fletxa no va aquí. Llegeix la pista i torna-ho a provar.";
+    after(i, predDone(i)?"#quiz .qb":null);
+  };
+  if(show) show.onclick=()=>{
+    Q.pred.forEach(p=>S.pred.done[p.row]=true);
+    if(S.pred.first===null) S.pred.first=false;
+    S.pred.shown=true; S.pred.msg="Aquí ho tens: "+Q.predYes+" Mira el tauler.";
+    after(i);
+  };
+  box.querySelectorAll(".pill").forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.k, v=+b.dataset.v;
+    if(v===Q.cls.items[k][2]){ S.cls.ok[k]=true; delete S.cls.bad[k]; }
+    else { S.cls.bad[k]=v; S.cls.wrong=true; }
+    after(i);
+  });
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const k=+b.dataset.o;
+    if(S.test.first===null) S.test.first=(k===T.ok);
+    if(k===T.ok){ S.test.done=true; } else { S.test.last=k; }
+    after(i);
+  });
+}
+function after(i){
+  const y=$("#scroll").scrollTop;
+  renderQuiz(i); updateBoard(i); updateChecks();
+  $("#scroll").scrollTop=y;
 }
 
 /* ---------- NAVEGACIÓ ---------- */
@@ -447,6 +691,7 @@ function go(i){
 $("#prev").onclick=()=>go(cur-1);
 $("#next").onclick=()=>go(cur+1);
 document.addEventListener("keydown",e=>{
+  if(e.target && e.target.tagName==="INPUT") return;
   if(e.key==="ArrowRight") go(cur+1);
   if(e.key==="ArrowLeft") go(cur-1);
 });
